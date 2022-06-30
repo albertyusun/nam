@@ -44,7 +44,7 @@ class NAMBase:
         num_learners: int = 1,
         n_jobs: int = None,
         warm_start: bool = False,
-        random_state: int = 42
+        random_state: int = 42,
     ) -> None:
         self.units_multiplier = units_multiplier
         self.num_basis_functions = num_basis_functions
@@ -72,8 +72,8 @@ class NAMBase:
         self.warm_start = warm_start
         self.random_state = random_state
 
-        self._best_checkpoint_suffix = 'best'
-        self._fitted = False
+        #self._best_checkpoint_suffix = 'best'
+        #self._fitted = False
 
     def _set_random_state(self):
         random.seed(self.random_state)
@@ -246,6 +246,7 @@ class NAMClassifier(NAMBase):
         n_jobs: int = None,
         warm_start: bool = False,
         random_state: int = 42
+        regression: bool = False
     ) -> None:
         super(NAMClassifier, self).__init__(
             units_multiplier=units_multiplier,
@@ -274,7 +275,8 @@ class NAMClassifier(NAMBase):
             warm_start = warm_start,
             random_state=random_state
         )
-        self.regression = False
+        self.regression = regression
+        #self.regression = False
 
     def fit(self, X, y, w=None):
         if isinstance(X, pd.DataFrame):
@@ -294,6 +296,41 @@ class NAMClassifier(NAMBase):
 
     def predict(self, X) -> ArrayLike:
         return self.predict_proba(X).round()
+
+    
+
+    def get_params(self, deep=True):
+        return {"units_multiplier": self.units_multiplier, 
+                "num_basis_functions": self.num_basis_functions,
+                "hidden_sizes": self.hidden_sizes,
+                "dropout": self.dropout,
+                "feature_dropout": self.feature_dropout,
+                "batch_size": self.batch_size,
+                "num_workers": self.num_workers,
+                "num_epochs": self.num_epochs,
+                "log_dir": self.log_dir,
+                "val_split": self.val_split,
+                "device": self.device,
+                "lr": self.lr,
+                "decay_rate": self.decay_rate,
+                "output_reg": self.output_reg,
+                "l2_reg": self.l2_reg,
+                "save_model_frequency": self.save_model_frequency,
+                "patience": self.patience,
+                "monitor_loss": self.monitor_loss,
+                "early_stop_mode":  self.early_stop_mode,
+                "loss_func":  self.loss_func,
+                "metric":  self.metric,
+                "num_learners":  self.num_learners,
+                "n_jobs": self.n_jobs,
+                "warm_start": self.warm_start,
+                "random_state": self.random_state
+                }
+
+    def set_params(self, **parameters):
+        for parameter, value in parameters.items():
+            setattr(self, parameter, value)
+        return self
 
     
 class NAMRegressor(NAMBase):
